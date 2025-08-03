@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawsome World - Everything About Cats</title>
+    
+    <!-- Cute Cat Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='catGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23ff6b9d;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23ffc3d8;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23catGrad)' stroke='%23fff' stroke-width='1'/%3E%3Cpath d='M10 12 L7 8 L9 7 L12 11 Z' fill='%23ff6b9d'/%3E%3Cpath d='M22 12 L25 8 L23 7 L20 11 Z' fill='%23ff6b9d'/%3E%3Ccircle cx='11' cy='14' r='1.5' fill='%23333'/%3E%3Ccircle cx='21' cy='14' r='1.5' fill='%23333'/%3E%3Cpath d='M16 17 Q14 19 12 18.5 Q16 20 20 18.5 Q18 19 16 17 Z' fill='%23ff8fab'/%3E%3Cpath d='M16 17 L16 19' stroke='%23333' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M13 20 Q16 22 19 20' stroke='%23333' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='11.5' cy='14.5' r='0.3' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='21.5' cy='14.5' r='0.3' fill='%23fff' opacity='0.8'/%3E%3C/svg%3E">
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+            min-height: 100vh;
+            color: #5a4a6a;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem 0;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid #ffb6c1;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #5a4a6a;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: rgba(255, 182, 193, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.router-link-active {
+            background: linear-gradient(45deg, #ff6b9d, #ffc3d8);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+            border-color: #ff6b9d;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: calc(100vh - 140px);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: url('/images/logo-cat.png') center/cover;
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            color: #7c6a86;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin: 4rem 0;
+        }
+
+        .cat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.2);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 182, 193, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .cat-card:hover::before {
+            animation: shimmer 1.5s ease-in-out;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(255, 107, 157, 0.3);
+        }
+
+        .cat-card-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+        }
+
+        .cat-card h3 {
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .cat-card p {
+            line-height: 1.8;
+            color: #7c6a86;
+            font-weight: 400;
+        }
+
+        .breed-detail {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(255, 182, 193, 0.2);
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+        }
+
+        .breed-detail h2 {
+            color: #ff6b9d;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .breed-image {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 25px;
+            object-fit: cover;
+            margin: 1.5rem auto;
+            display: block;
+            box-shadow: 0 15px 30px rgba(255, 107, 157, 0.2);
+        }
+
+        .breed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #fff, #fef7f7);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: #ffb6c1;
+        }
+
+        .stat-label {
+            font-weight: 700;
+            color: #ff6b9d;
+            font-size: 1.1rem;
+        }
+
+        .care-section {
+            margin: 3rem 0;
+        }
+
+        .care-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .care-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 25px;
+            border-left: 6px solid #ff6b9d;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .care-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 107, 157, 0.3);
+        }
+
+        .care-item h3 {
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .care-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .back-button:hover {
+            background: linear-gradient(45deg, #ff8fab, #ffc3d8);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 157, 0.4);
+        }
+
+        .learn-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .learn-more-btn:hover {
+            background: linear-gradient(45deg, #ff8fab, #ffc3d8);
+            transform: translateY(-2px);
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 0.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .cat-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const { createApp } = Vue;
+        const { createRouter, createWebHistory } = VueRouter;
+
+        // Components
+        const Home = {
+            template: `
+                <div>
+                    <div class="hero">
+                        <h1 class="floating">Pawsome World</h1>
+                        <p>Discover the wonderful world of cats, from adorable breeds to caring tips and everything in between</p>
+                    </div>
+                    
+                    <div class="cat-grid">
+                        <div class="cat-card">
+                            <img src="/images/home-domestic.jpg" alt="Domestic Cat" class="cat-card-image">
+                            <h3>Domestic Sweethearts</h3>
+                            <p>Learn about common house cats, their adorable behaviors, and what makes them perfect companions. From playful kittens to wise senior cats who rule the house with gentle paws.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/home-wild.jpg" alt="Wild Cat" class="cat-card-image">
+                            <h3>Wild Relatives</h3>
+                            <p>Explore the majestic connection between your house cat and their wild cousins like lions, tigers, and leopards. Discover the amazing similarities that make them all feline family!</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/home-biology.jpg" alt="Cat Eyes" class="cat-card-image">
+                            <h3>Amazing Biology</h3>
+                            <p>Fascinating facts about cat anatomy, their incredible supersonic hearing, night vision, and unique physical abilities that make them the ultimate cuddle-hunters.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/home-behavior.jpg" alt="Cat Behavior" class="cat-card-image">
+                            <h3>Cute Behaviors</h3>
+                            <p>Understanding cat communication, adorable body language, and social quirks. Why do they purr, knead with their paws, and bring you the most "thoughtful" gifts?</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const Breeds = {
+            data() {
+                return {
+                    breeds: [
+                        {
+                            id: 'persian',
+                            name: 'Persian',
+                            description: 'Fluffy clouds with the sweetest personalities and luxurious coats',
+                            origin: 'Iran (Persia)',
+                            image: '/images/breeds/persian-card.jpg'
+                        },
+                        {
+                            id: 'siamese',
+                            name: 'Siamese',
+                            description: 'Chatty, intelligent socialites with stunning blue eyes',
+                            origin: 'Thailand',
+                            image: '/images/breeds/siamese-card.jpg'
+                        },
+                        {
+                            id: 'maine-coon',
+                            name: 'Maine Coon',
+                            description: 'Gentle giants with dog-like personalities and majestic fluff',
+                            origin: 'United States',
+                            image: '/images/breeds/maine-coon-card.jpg'
+                        },
+                        {
+                            id: 'british-shorthair',
+                            name: 'British Shorthair',
+                            description: 'Teddy bear cats with the softest coats and calmest demeanor',
+                            origin: 'United Kingdom',
+                            image: '/images/breeds/british-shorthair-card.jpg'
+                        },
+                        {
+                            id: 'ragdoll',
+                            name: 'Ragdoll',
+                            description: 'Living plush toys that melt in your arms with pure love',
+                            origin: 'United States',
+                            image: '/images/breeds/ragdoll-card.jpg'
+                        },
+                        {
+                            id: 'bengal',
+                            name: 'Bengal',
+                            description: 'Mini leopards with wild beauty and playful energy',
+                            origin: 'United States',
+                            image: '/images/breeds/bengal-card.jpg'
+                        }
+                    ]
+                }
+            },
+            template: `
+                <div>
+                    <div class="hero">
+                        <h1>Adorable Cat Breeds</h1>
+                        <p>Meet the most lovable feline friends and their unique personalities</p>
+                    </div>
+                    
+                    <div class="cat-grid">
+                        <div v-for="breed in breeds" :key="breed.id" class="cat-card">
+                            <img :src="breed.image" :alt="breed.name" class="cat-card-image">
+                            <h3>{{ breed.name }}</h3>
+                            <p><strong>Origin:</strong> {{ breed.origin }}</p>
+                            <p>{{ breed.description }}</p>
+                            <router-link :to="'/breeds/' + breed.id" class="learn-more-btn">
+                                Learn More →
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const BreedDetail = {
+            data() {
+                return {
+                    breedData: {
+                        'persian': {
+                            name: 'Persian',
+                            origin: 'Iran (Persia)',
+                            size: 'Medium to Large',
+                            weight: '7-12 lbs',
+                            lifespan: '12-17 years',
+                            coat: 'Long, thick, luxurious',
+                            temperament: 'Gentle, quiet, sweet',
+                            description: 'Persian cats are like living stuffed animals with their long, flowing coats and sweet, gentle personalities. They prefer a quiet, predictable environment and are content to be professional lap warmers and cuddle experts.',
+                            image: '/images/breeds/persian-detail.jpg',
+                            care: [
+                                'Daily brushing required to keep their coat fluffy and mat-free',
+                                'Regular eye cleaning due to their adorable flat face structure',
+                                'Indoor living recommended to protect their gorgeous coat',
+                                'High-quality diet for maintaining that silky coat health'
+                            ]
+                        },
+                        'siamese': {
+                            name: 'Siamese',
+                            origin: 'Thailand',
+                            size: 'Medium',
+                            weight: '8-12 lbs',
+                            lifespan: '12-15 years',
+                            coat: 'Short, fine, close-lying',
+                            temperament: 'Vocal, intelligent, social',
+                            description: 'Siamese cats are the chatterboxes of the cat world, highly intelligent and social butterflies known for their striking blue eyes and color-point pattern. They form incredibly strong bonds with their humans and will tell you all about their day.',
+                            image: '/images/breeds/siamese-detail.jpg',
+                            care: [
+                                'Regular grooming with weekly brushing sessions',
+                                'Mental stimulation through interactive puzzle toys',
+                                'Lots of social interaction - they hate being alone',
+                                'Regular dental care for their chatty mouths'
+                            ]
+                        },
+                        'maine-coon': {
+                            name: 'Maine Coon',
+                            origin: 'United States',
+                            size: 'Large',
+                            weight: '10-25 lbs',
+                            lifespan: '12-15 years',
+                            coat: 'Semi-long, weather-resistant',
+                            temperament: 'Gentle, friendly, intelligent',
+                            description: 'Maine Coons are the gentle giants of the cat world, often called "dog-cats" for their loyal, friendly personalities. These majestic fluffballs are excellent with families and love to follow their humans around like devoted shadows.',
+                            image: '/images/breeds/maine-coon-detail.jpg',
+                            care: [
+                                'Regular brushing 2-3 times per week to manage their magnificent coat',
+                                'Extra-large litter boxes to accommodate their impressive size',
+                                'High-protein diet to support their large, muscular frame',
+                                'Plenty of climbing trees and exercise opportunities'
+                            ]
+                        },
+                        'british-shorthair': {
+                            name: 'British Shorthair',
+                            origin: 'United Kingdom',
+                            size: 'Medium to Large',
+                            weight: '9-17 lbs',
+                            lifespan: '12-17 years',
+                            coat: 'Short, dense, plush',
+                            temperament: 'Calm, dignified, loyal',
+                            description: 'British Shorthairs are like living teddy bears with their round faces, dense coats, and calm demeanor. They are independent but affectionate cats who prefer to show love through gentle head bonks and quiet companionship.',
+                            image: '/images/breeds/british-shorthair-detail.jpg',
+                            care: [
+                                'Weekly brushing to remove loose hair and keep coat soft',
+                                'Weight management - they love food a bit too much',
+                                'Regular gentle exercise to maintain their health',
+                                'Routine veterinary checkups for their wellbeing'
+                            ]
+                        },
+                        'ragdoll': {
+                            name: 'Ragdoll',
+                            origin: 'United States',
+                            size: 'Large',
+                            weight: '10-20 lbs',
+                            lifespan: '12-17 years',
+                            coat: 'Semi-long, silky',
+                            temperament: 'Docile, affectionate, calm',
+                            description: 'Ragdolls are famous for their docile nature and tendency to go completely limp when picked up, like a ragdoll toy. They are extremely affectionate lap cats who will follow their favorite humans around and greet them at the door.',
+                            image: '/images/breeds/ragdoll-detail.jpg',
+                            care: [
+                                'Regular brushing to prevent their silky coat from matting',
+                                'Indoor living recommended for their safety and trusting nature',
+                                'Gentle handling due to their incredibly trusting personality',
+                                'Regular grooming sessions they absolutely love'
+                            ]
+                        },
+                        'bengal': {
+                            name: 'Bengal',
+                            origin: 'United States',
+                            size: 'Medium to Large',
+                            weight: '8-15 lbs',
+                            lifespan: '12-16 years',
+                            coat: 'Short, spotted or marbled',
+                            temperament: 'Active, intelligent, wild-looking',
+                            description: 'Bengals look like mini leopards with their gorgeous spotted coats but are fully domestic sweethearts. They are highly active and intelligent cats who love to climb, play, and explore every corner of their domain.',
+                            image: '/images/breeds/bengal-detail.jpg',
+                            care: [
+                                'High levels of mental and physical stimulation daily',
+                                'Interactive puzzle toys and tall climbing trees',
+                                'Regular energetic play sessions to tire them out',
+                                'Secure environment - they are clever escape artists'
+                            ]
+                        }
+                    }
+                }
+            },
+            computed: {
+                breed() {
+                    return this.breedData[this.$route.params.id] || null;
+                }
+            },
+            template: `
+                <div v-if="breed">
+                    <router-link to="/breeds" class="back-button">← Back to Breeds</router-link>
+                    
+                    <div class="breed-detail">
+                        <h2>{{ breed.name }}</h2>
+                        <img :src="breed.image" :alt="breed.name" class="breed-image">
+                        <p>{{ breed.description }}</p>
+                        
+                        <div class="breed-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Origin</div>
+                                <div>{{ breed.origin }}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Size</div>
+                                <div>{{ breed.size }}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Weight</div>
+                                <div>{{ breed.weight }}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Lifespan</div>
+                                <div>{{ breed.lifespan }}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Coat</div>
+                                <div>{{ breed.coat }}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Temperament</div>
+                                <div>{{ breed.temperament }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="care-section">
+                            <h3>Care Requirements</h3>
+                            <div class="care-grid">
+                                <div v-for="care in breed.care" :key="care" class="care-item">
+                                    {{ care }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                    <router-link to="/breeds" class="back-button">← Back to Breeds</router-link>
+                    <div class="breed-detail">
+                        <h2>Breed not found</h2>
+                        <p>The requested breed information is not available.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        const Care = {
+            template: `
+                <div>
+                    <div class="hero">
+                        <h1>Loving Cat Care</h1>
+                        <p>Essential tips for keeping your precious feline friend healthy and purr-fectly happy</p>
+                    </div>
+                    
+                    <div class="care-grid">
+                        <div class="care-item">
+                            <img src="/images/care/nutrition.jpg" alt="Cat Food" class="care-icon">
+                            <h3>Nutrition</h3>
+                            <p>Feed high-quality cat food appropriate for your kitty's age and lifestyle. Adult cats need protein-rich diets to maintain their hunting prowess. Always provide fresh water and avoid foods toxic to cats like chocolate, onions, and grapes.</p>
+                        </div>
+                        
+                        <div class="care-item">
+                            <img src="/images/care/grooming.jpg" alt="Cat Grooming" class="care-icon">
+                            <h3>Grooming</h3>
+                            <p>Regular brushing prevents matting and reduces adorable tumbleweeds of fur around your home. Long-haired cats need daily brushing, while short-haired cats benefit from weekly spa sessions. Trim nails regularly and clean ears as needed.</p>
+                        </div>
+                        
+                        <div class="care-item">
+                            <img src="/images/care/health.jpg" alt="Cat Health" class="care-icon">
+                            <h3>Health</h3>
+                            <p>Schedule annual vet checkups and keep vaccinations current. Watch for signs of illness like changes in appetite, behavior, or litter box habits. Spay/neuter for better health, behavior, and to prevent unwanted litters.</p>
+                        </div>
+                        
+                        <div class="care-item">
+                            <img src="/images/care/exercise.jpg" alt="Cat Playing" class="care-icon">
+                            <h3>Exercise & Play</h3>
+                            <p>Provide interactive toys, scratching posts, and climbing adventures. Daily play sessions help maintain healthy weight and mental stimulation. Laser pointers, feather wands, and catnip mice are perfect for releasing their inner tiger.</p>
+                        </div>
+                        
+                        <div class="care-item">
+                            <img src="/images/care/environment.jpg" alt="Cat Home" class="care-icon">
+                            <h3>Safe Environment</h3>
+                            <p>Create a safe, enriched kingdom with cozy hiding spots, sunny perches, and pristine litter boxes. Follow the 1+1 rule: one litter box per cat plus one extra. Keep toxic plants and small objects safely away from curious paws.</p>
+                        </div>
+                        
+                        <div class="care-item">
+                            <img src="/images/care/mental-health.jpg" alt="Happy Cat" class="care-icon">
+                            <h3>Mental Wellbeing</h3>
+                            <p>Cats thrive on routine and security. Provide consistent feeding times, gentle handling, and respect their need for independence. Multiple cats should be introduced gradually with patience and lots of treats for positive associations.</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const About = {
+            template: `
+                <div>
+                    <div class="hero">
+                        <h1>Amazing Cat Facts</h1>
+                        <p>Discover the incredible secrets and fascinating abilities of our beloved feline companions</p>
+                    </div>
+                    
+                    <div class="cat-grid">
+                        <div class="cat-card">
+                            <img src="/images/about/evolution.jpg" alt="Cat Evolution" class="cat-card-image">
+                            <h3>Ancient Origins</h3>
+                            <p>Domestic cats evolved from the African wildcat around 9,000 years ago. They were first domesticated in the ancient Near East and have since conquered the world, adapting to every environment while keeping their adorable hunting instincts.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/about/senses.jpg" alt="Cat Eyes" class="cat-card-image">
+                            <h3>Super Senses</h3>
+                            <p>Cats can see perfectly in near darkness with just 1/6th the light humans need. They have incredible hearing, detecting sounds up to 64,000 Hz. Their whiskers are like tiny radar systems that detect air currents and help them navigate in complete darkness.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/about/intelligence.jpg" alt="Smart Cat" class="cat-card-image">
+                            <h3>Brilliant Minds</h3>
+                            <p>Cats have excellent long-term memory and can learn through careful observation. They recognize their names, understand daily routines, and can solve complex problems. Each cat has a unique personality and preferred learning style - just like humans!</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/about/communication.jpg" alt="Cat Communication" class="cat-card-image">
+                            <h3>Secret Language</h3>
+                            <p>Cats primarily meow to communicate with humans, not other cats! They use sophisticated body language, scent marking, and various adorable vocalizations. Purring isn't just happiness - cats also purr when stressed, injured, or healing.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/about/athletic.jpg" alt="Athletic Cat" class="cat-card-image">
+                            <h3>Athletic Superstars</h3>
+                            <p>Cats can sprint up to 30 mph, leap up to 6 times their body length, and always land gracefully on their feet thanks to their amazing righting reflex. They have incredibly flexible spines and powerful hind legs for jaw-dropping agility.</p>
+                        </div>
+                        
+                        <div class="cat-card">
+                            <img src="/images/about/global.jpg" alt="Cats Worldwide" class="cat-card-image">
+                            <h3>Global Conquest</h3>
+                            <p>There are over 500 million domestic cats worldwide, making them one of the most successful species on Earth. They're found on every continent except Antarctica and have played important roles throughout human history, from pest control to being worshipped as gods in ancient Egypt.</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Router configuration
+        const routes = [
+            { path: '/', component: Home },
+            { path: '/breeds', component: Breeds },
+            { path: '/breeds/:id', component: BreedDetail },
+            { path: '/care', component: Care },
+            { path: '/about', component: About },
+            { path: '/:pathMatch(.*)*', redirect: '/' } // Catch-all route
+        ];
+
+        const router = createRouter({
+            history: createWebHistory(),
+            routes
+        });
+
+        // Main App Component
+        const App = {
+            template: `
+                <div class="app-container">
+                    <header>
+                        <nav>
+                            <router-link to="/" class="logo">
+                                <img src="/images/logo-cat.png" alt="Pawsome World">
+                                Pawsome World
+                            </router-link>
+                            <ul class="nav-links">
+                                <li><router-link to="/">Home</router-link></li>
+                                <li><router-link to="/breeds">Breeds</router-link></li>
+                                <li><router-link to="/care">Care</router-link></li>
+                                <li><router-link to="/about">About</router-link></li>
+                            </ul>
+                        </nav>
+                    </header>
+                    
+                    <main class="main-content">
+                        <router-view></router-view>
+                    </main>
+                </div>
+            `
+        };
+
+        // Create and mount the app
+        createApp(App).use(router).mount('#app');
+    </script>
+</body>
+</html>
